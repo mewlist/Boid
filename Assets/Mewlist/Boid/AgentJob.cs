@@ -12,13 +12,13 @@ namespace Mewlist.Boid
 {
     internal struct AgentJob : IJobParallelFor
     {
-        [NativeDisableParallelForRestriction] public ComponentDataArray<Position>  positions;
-        public ComponentDataArray<Rotation>  rotations;
-        [NativeDisableParallelForRestriction] public ComponentDataArray<AgentData> agents;
+        [NativeDisableParallelForRestriction] private ComponentDataArray<Position>  positions;
+        private                                       ComponentDataArray<Rotation>  rotations;
+        [NativeDisableParallelForRestriction] private ComponentDataArray<AgentData> agents;
 
-        public float           timeDelta;
-        public Cluster         cluster;
-        public SharedAgentData agentData;
+        private float           timeDelta;
+        private Cluster         cluster;
+        private SharedAgentData agentData;
 
         public AgentJob(int count)
         {
@@ -42,11 +42,11 @@ namespace Mewlist.Boid
 
         public void Update(AgentCollection agentCollection, SharedAgentData sharedAgentData)
         {
-            cluster.SetAgentPositions(agentCollection.positions);
+            cluster.SetAgentPositions(agentCollection.Positions);
 
-            positions = agentCollection.positions;
-            rotations = agentCollection.rotations;
-            agents    = agentCollection.agents;
+            positions = agentCollection.Positions;
+            rotations = agentCollection.Potations;
+            agents    = agentCollection.Agents;
             agentData = sharedAgentData;
 
             switch (agentData.SimulationTime)
@@ -66,7 +66,7 @@ namespace Mewlist.Boid
             var position      = positions[i];
             var rotation      = rotations[i];
             var agent         = agents[i];
-            var forceValue    = float3.zero;
+            var force         = float3.zero;
             var neighborsHash = new HashSet<int>();
 
             cluster.SearchNeighbors(i, agent.Velocity, ref neighborsHash, 5f, agentData.MaxNeighborCount);
@@ -84,12 +84,12 @@ namespace Mewlist.Boid
                 dots[j]      = Vector3.Dot(agents[i].Velocity, direction);
             }
 
-            forceValue += Cohesion(i, neighborsList, distances, dots);
-            forceValue += Separation(i, neighborsList, distances, dots);
-            forceValue += Alignment(i, neighborsList, distances, dots);
-            forceValue += Prey(i, neighborsList, distances, dots);
+            force += Cohesion(i, neighborsList, distances, dots);
+            force += Separation(i, neighborsList, distances, dots);
+            force += Alignment(i, neighborsList, distances, dots);
+            force += Prey(i, neighborsList, distances, dots);
 
-            var velocity  = agent.Velocity + forceValue * timeDelta;
+            var velocity  = agent.Velocity + force * timeDelta;
             var hVelocity = new Vector2(velocity.x, velocity.z).magnitude;
 
             velocity.y = Mathf.Clamp(velocity.y, -0.8f * hVelocity, 0.8f * hVelocity);
@@ -104,12 +104,12 @@ namespace Mewlist.Boid
             else
                 agent.Velocity = normalizedVelocity * (velocityMagnitude + agentData.VelocityRange.y) / 2f;
 
-            position.Value += agent.Velocity * timeDelta;
-            rotation.Value = Quaternion.LookRotation(agent.Velocity) * Quaternion.Euler(-90f, 0f, 0f);
+            position.Value += agent.Velocity                          * timeDelta;
+            rotation.Value =  Quaternion.LookRotation(agent.Velocity) * Quaternion.Euler(-90f, 0f, 0f);
 
             positions[i] = position;
             rotations[i] = rotation;
-            agents[i] = agent;
+            agents[i]    = agent;
 
             distances.Dispose();
             dots.Dispose();
@@ -118,28 +118,28 @@ namespace Mewlist.Boid
         private float3 Cohesion(
             int                index,
             int[]              neighbors,
-            NativeArray<float> dists,
+            NativeArray<float> distances,
             NativeArray<float> dots)
         {
-            var position           = positions[index];
-            var agent              = agents[index];
-            var center             = float3.zero;
-            var centerProcessCount = 0;
+            var position    = positions[index];
+            var agent       = agents[index];
+            var center      = float3.zero;
+            var targetCount = 0;
 
             for (var i = 0; i < neighbors.Length; i++)
             {
                 var neighborIndex = neighbors[i];
                 if (index == neighborIndex) continue;
-                if (dists[i] < agentData.MaxCohesionDistance && dots[i] > -1f)
+                if (distances[i] < agentData.MaxCohesionDistance && dots[i] > -1f)
                 {
                     center += positions[neighborIndex].Value;
-                    centerProcessCount++;
+                    targetCount++;
                 }
             }
 
-            if (centerProcessCount > 0) center /= centerProcessCount;
+            if (targetCount > 0) center /= targetCount;
 
-            return centerProcessCount > 0
+            return targetCount > 0
                 ? agentData.CohesionFactor * (center - position.Value)
                 : 0;
         }
@@ -210,10 +210,10 @@ namespace Mewlist.Boid
             NativeArray<float> dots)
         {
             var position = positions[index];
-            var force    = agents[index];
+            var agent    = agents[index];
 
-            var returnDist = Vector3.Magnitude(agentData.Follow - position.Value);
-            return agentData.PreyFactor * (agentData.Follow - position.Value) * returnDist * 0.01f;
+            var distanceToPrey = Vector3.Magnitude(agentData.Prey - position.Value);
+            return agentData.PreyFactor * (agentData.Prey - position.Value) * distanceToPrey * 0.01f;
         }
     }
 }

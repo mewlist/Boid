@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Mewlist.Boid
 {
-    [AlwaysUpdateSystem]
     public class BoidSystem : ComponentSystem
     {
         [Inject] private AgentCollection agentCollection;
@@ -16,7 +15,7 @@ namespace Mewlist.Boid
         private bool IsSetupRequired => agentCollection.Length != agentLength;
 
         private SharedAgentData SharedAgentData =>
-            EntityManager.GetSharedComponentData<SharedAgentData>(agentCollection.entities[0]);
+            EntityManager.GetSharedComponentData<SharedAgentData>(agentCollection.Entities[0]);
 
         protected override void OnCreateManager()
         {

@@ -16,49 +16,48 @@ namespace Mewlist.Boid
     public class BoidManager : MonoBehaviour
     {
         // mesh to render
-        [SerializeField]                   private Mesh     mesh;
-        [SerializeField]                   private Material material;
-        [Range(0.1f, 5f)] [SerializeField] private float    meshScale;
+        [SerializeField]                   private Mesh     mesh      = null;
+        [SerializeField]                   private Material material  = null;
+        [Range(0.1f, 5f)] [SerializeField] private float    meshScale = 1f;
 
         // min-max velocity of agent
-        [SerializeField] private Vector2 velocityRange;
+        [SerializeField] private Vector2 velocityRange = new Vector2(1f, 5f);
 
         // cohesion
-        [Range(0f, 5f)] [SerializeField]  private float cohesionFactor;
-        [Range(0f, 20f)] [SerializeField] private float maxCohesionDistance;
+        [Range(0f, 5f)] [SerializeField]  private float cohesionFactor      = 2f;
+        [Range(0f, 20f)] [SerializeField] private float maxCohesionDistance = 2f;
 
         // separation
-        [Range(0f, 20f)] [SerializeField] private float separationFactor;
+        [Range(0f, 20f)] [SerializeField] private float separationFactor = 2f;
 
         // alignment
-        [Range(0f, 5f)] [SerializeField]  private float alignmentFactor;
-        [Range(0f, 20f)] [SerializeField] private float maxAlignmentDistance;
+        [Range(0f, 5f)] [SerializeField]  private float alignmentFactor      = 2f;
+        [Range(0f, 20f)] [SerializeField] private float maxAlignmentDistance = 10f;
 
         // prey (position of this game object)
-        [Range(0f, 10f)] [SerializeField] private float preyFactor;
+        [Range(0f, 10f)] [SerializeField] private float preyFactor = 2f;
 
         // neighbor count to process
-        [Range(1, 100)] [SerializeField] private int maxNeighborCount;
+        [Range(1, 100)] [SerializeField] private int maxNeighborCount = 21;
 
         // agent count
-        [Range(1, 50000)] [SerializeField] private int agentCount;
+        [Range(1, 50000)] [SerializeField] private int agentCount = 500;
 
         // simulation time
-        [SerializeField] private SimulationTime simulationTime;
+        [SerializeField] private SimulationTime simulationTime = SimulationTime.TimeDelta;
 
         private World           boidWorld;
         private EntityManager   entityManager;
         private EntityArchetype entityArchetype;
 
-        private static List<World> worlds = new List<World>();
+        private static readonly List<World> worlds = new List<World>();
 
         private void OnEnable()
         {
             if (boidWorld != null) return;
 
-            Debug.Log("OnEnable");
             // get EntityManager
-            boidWorld     = new World("BoidWorld");
+            boidWorld = new World("BoidWorld");
             worlds.Add(boidWorld);
             World.Active = boidWorld;
 
@@ -70,7 +69,7 @@ namespace Mewlist.Boid
             entityManager = boidWorld.GetOrCreateManager<EntityManager>();
 
             ScriptBehaviourUpdateOrder.UpdatePlayerLoop(worlds.ToArray());
-            
+
             Debug.Assert(entityManager.IsCreated);
             // create ArchType
             entityArchetype = entityManager.CreateArchetype(
@@ -94,14 +93,20 @@ namespace Mewlist.Boid
         {
             if (entityManager == null) return;
 
-            Debug.Log("OnDisable");
-            var allEntities = entityManager.GetAllEntities();
-            var entityCount = allEntities.Length;
-            for (var i = 0; i < entityCount; i++)
-                RemoveEntity(allEntities[i]);
-            boidWorld.Dispose();
+            if (entityManager.IsCreated)
+            {
+                var allEntities = entityManager.GetAllEntities();
+                var entityCount = allEntities.Length;
+                for (var i = 0; i < entityCount; i++)
+                    RemoveEntity(allEntities[i]);
+            }
+
+            if (boidWorld.IsCreated)
+            {
+                boidWorld.Dispose();
+            }
             worlds.Remove(boidWorld);
-            boidWorld = null;
+            boidWorld     = null;
             entityManager = null;
         }
 
@@ -115,7 +120,7 @@ namespace Mewlist.Boid
                 {
                     SimulationTime       = simulationTime,
                     VelocityRange        = velocityRange,
-                    Follow               = transform.position,
+                    Prey               = transform.position,
                     AlignmentFactor      = alignmentFactor,
                     SeparationFactor     = separationFactor,
                     CohesionFactor       = cohesionFactor,
@@ -182,7 +187,7 @@ namespace Mewlist.Boid
             {
                 SimulationTime       = simulationTime,
                 VelocityRange        = velocityRange,
-                Follow               = transform.position,
+                Prey               = transform.position,
                 AlignmentFactor      = alignmentFactor,
                 SeparationFactor     = separationFactor,
                 CohesionFactor       = cohesionFactor,

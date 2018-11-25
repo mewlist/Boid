@@ -17,7 +17,7 @@ namespace Mewlist.Boid
     {
         public SimulationTime SimulationTime;
         public float2         VelocityRange;
-        public float3         Follow;
+        public float3         Prey;
         public float          CohesionFactor;
         public float          SeparationFactor;
         public float          AlignmentFactor;
@@ -30,9 +30,9 @@ namespace Mewlist.Boid
     public struct AgentCollection
     {
         public readonly   int                           Length;
-        public            ComponentDataArray<Position>  positions;
-        public            ComponentDataArray<Rotation>  rotations;
-        public            ComponentDataArray<AgentData> agents;
-        [ReadOnly] public EntityArray                   entities;
+        public            ComponentDataArray<Position>  Positions;
+        public            ComponentDataArray<Rotation>  Potations;
+        public            ComponentDataArray<AgentData> Agents;
+        [ReadOnly] public EntityArray                   Entities;
     }
 }
