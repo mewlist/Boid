@@ -11,6 +11,7 @@ namespace Mewlist.Boid
 
         private AgentJob       job;
         private int            agentLength = 0;
+        private ComponentGroup group;
 
         private bool IsSetupRequired => agentCollection.Length != agentLength;
 
@@ -30,6 +31,7 @@ namespace Mewlist.Boid
 
         protected override void OnUpdate()
         {
+            if (agentCollection.Length == 0) return;
             if (IsSetupRequired) Setup();
 
             // update

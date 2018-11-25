@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace Mewlist.Boid
 {
@@ -30,6 +31,7 @@ namespace Mewlist.Boid
     {
         public readonly   int                           Length;
         public            ComponentDataArray<Position>  positions;
+        public            ComponentDataArray<Rotation>  rotations;
         public            ComponentDataArray<AgentData> agents;
         [ReadOnly] public EntityArray                   entities;
     }

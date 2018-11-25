@@ -105,6 +105,14 @@ namespace Mewlist.Boid
                 if (yi < 0 || yi >= maxAgents) yDone = true;
                 if (zi < 0 || zi >= maxAgents) zDone = true;
 
+                if (!zDone)
+                {
+                    var data = zSorted[zi];
+                    if (maxDist < data.position.z - selfPos.z) zDone = true;
+                    else list.Add(zSorted[zi].index);
+                    zi += zd;
+                }
+
                 if (!xDone)
                 {
                     var data = xSorted[xi];
@@ -115,18 +123,10 @@ namespace Mewlist.Boid
 
                 if (!yDone)
                 {
-                    var data = xSorted[yi];
+                    var data = ySorted[yi];
                     if (maxDist < data.position.y - selfPos.y) yDone = true;
-                    else list.Add(xSorted[yi].index);
+                    else list.Add(ySorted[yi].index);
                     yi += yd;
-                }
-
-                if (!zDone)
-                {
-                    var data = zSorted[zi];
-                    if (maxDist < data.position.z - selfPos.z) zDone = true;
-                    else list.Add(xSorted[zi].index);
-                    zi += zd;
                 }
 
                 if (list.Count > maxCount) break;

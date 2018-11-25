@@ -13,6 +13,7 @@ namespace Mewlist.Boid
     internal struct AgentJob : IJobParallelFor
     {
         [NativeDisableParallelForRestriction] public ComponentDataArray<Position>  positions;
+        public ComponentDataArray<Rotation>  rotations;
         [NativeDisableParallelForRestriction] public ComponentDataArray<AgentData> agents;
 
         public float           timeDelta;
@@ -24,6 +25,7 @@ namespace Mewlist.Boid
             timeDelta = Time.deltaTime;
             cluster   = new Cluster(count);
             positions = new ComponentDataArray<Position>();
+            rotations = new ComponentDataArray<Rotation>();
             agents    = new ComponentDataArray<AgentData>();
             agentData = default(SharedAgentData);
         }
@@ -43,6 +45,7 @@ namespace Mewlist.Boid
             cluster.SetAgentPositions(agentCollection.positions);
 
             positions = agentCollection.positions;
+            rotations = agentCollection.rotations;
             agents    = agentCollection.agents;
             agentData = sharedAgentData;
 
@@ -61,6 +64,7 @@ namespace Mewlist.Boid
         private void Process(int i)
         {
             var position      = positions[i];
+            var rotation      = rotations[i];
             var agent         = agents[i];
             var forceValue    = float3.zero;
             var neighborsHash = new HashSet<int>();
@@ -101,9 +105,11 @@ namespace Mewlist.Boid
                 agent.Velocity = normalizedVelocity * (velocityMagnitude + agentData.VelocityRange.y) / 2f;
 
             position.Value += agent.Velocity * timeDelta;
+            rotation.Value = Quaternion.LookRotation(agent.Velocity) * Quaternion.Euler(-90f, 0f, 0f);
 
             positions[i] = position;
-            agents[i]    = agent;
+            rotations[i] = rotation;
+            agents[i] = agent;
 
             distances.Dispose();
             dots.Dispose();
@@ -164,7 +170,7 @@ namespace Mewlist.Boid
             if (nearestNeighborIndex != -1)
             {
                 float3 dir = Vector3.Normalize(position.Value - positions[nearestNeighborIndex].Value);
-                separation += (agentData.MaxCohesionDistance - distances[nearestNeighborIndex]) * dir;
+                separation += Mathf.Pow(agentData.MaxCohesionDistance - minDist, 2f) * dir;
             }
 
             return agentData.SeparationFactor * separation;

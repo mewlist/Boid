@@ -138,20 +138,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 75647705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5139f1592a7bc4fabaf57599f7c86171, type: 3}
+  m_Script: {fileID: 11500000, guid: b7d3060680e2b2048aff640948c222d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  material: {fileID: 2100000, guid: fbc83bac5c2ca40c1b0b6f3a762c4a9a, type: 2}
-  meshScale: 0.24
-  velocityRange: {x: 4, y: 20}
+  mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  meshScale: 0.15
+  velocityRange: {x: 3, y: 10}
   cohesionFactor: 5
-  maxCohesionDistance: 11.36
-  separationFactor: 4.46
-  alignmentFactor: 4.43
-  maxAlignmentDistance: 8.51
-  preyFactor: 1
-  maxNeighborCount: 47
+  maxCohesionDistance: 4.74
+  separationFactor: 4.64
+  alignmentFactor: 5
+  maxAlignmentDistance: 9.33
+  preyFactor: 2.05
+  maxNeighborCount: 50
   agentCount: 1000
   simulationTime: 0
 --- !u!4 &75647707
@@ -162,7 +162,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 75647705}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 30}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
