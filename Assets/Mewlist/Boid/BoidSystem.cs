@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Mewlist.Boid
 {
-    public class BoidSystem : ComponentSystem
+    public class BoidSystem : JobComponentSystem
     {
         [Inject] private AgentCollection agentCollection;
 
@@ -28,17 +28,17 @@ namespace Mewlist.Boid
             base.OnDestroyManager();
         }
 
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            if (agentCollection.Length == 0) return;
+            if (agentCollection.Length == 0) return inputDeps;
             if (IsSetupRequired) Setup();
 
             // update
             job.Update(agentCollection, SharedAgentData);
 
             // execute
-            var jobHandle = job.Schedule(agentCollection.Length, 50);
-            jobHandle.Complete();
+            var jobHandle = job.Schedule(agentCollection.Length, 50, inputDeps);
+            return jobHandle;
         }
 
         private void Setup()

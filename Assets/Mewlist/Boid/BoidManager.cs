@@ -114,21 +114,23 @@ namespace Mewlist.Boid
         {
             if (entityManager == null) return;
 
+            var sharedAgentData = new SharedAgentData
+            {
+                SimulationTime = simulationTime,
+                VelocityRange = velocityRange,
+                Prey = transform.position,
+                AlignmentFactor = alignmentFactor,
+                SeparationFactor = separationFactor,
+                CohesionFactor = cohesionFactor,
+                PreyFactor = preyFactor,
+                MaxCohesionDistance = maxCohesionDistance,
+                MaxAlignmentDistance = maxAlignmentDistance,
+                MaxNeighborCount = maxNeighborCount,
+            };
+
             foreach (var sample in entityManager.GetAllEntities())
             {
-                entityManager.SetSharedComponentData(sample, new SharedAgentData
-                {
-                    SimulationTime       = simulationTime,
-                    VelocityRange        = velocityRange,
-                    Prey               = transform.position,
-                    AlignmentFactor      = alignmentFactor,
-                    SeparationFactor     = separationFactor,
-                    CohesionFactor       = cohesionFactor,
-                    PreyFactor           = preyFactor,
-                    MaxCohesionDistance  = maxCohesionDistance,
-                    MaxAlignmentDistance = maxAlignmentDistance,
-                    MaxNeighborCount     = maxNeighborCount,
-                });
+                entityManager.SetSharedComponentData(sample, sharedAgentData);
             }
         }
 
@@ -183,19 +185,21 @@ namespace Mewlist.Boid
                 material = material,
             });
 
-            entityManager.SetSharedComponentData(entity, new SharedAgentData
+            var sharedAgentData = new SharedAgentData
             {
-                SimulationTime       = simulationTime,
-                VelocityRange        = velocityRange,
-                Prey               = transform.position,
-                AlignmentFactor      = alignmentFactor,
-                SeparationFactor     = separationFactor,
-                CohesionFactor       = cohesionFactor,
-                PreyFactor           = preyFactor,
-                MaxCohesionDistance  = maxCohesionDistance,
+                SimulationTime = simulationTime,
+                VelocityRange = velocityRange,
+                Prey = transform.position,
+                AlignmentFactor = alignmentFactor,
+                SeparationFactor = separationFactor,
+                CohesionFactor = cohesionFactor,
+                PreyFactor = preyFactor,
+                MaxCohesionDistance = maxCohesionDistance,
                 MaxAlignmentDistance = maxAlignmentDistance,
-                MaxNeighborCount     = maxNeighborCount
-            });
+                MaxNeighborCount = maxNeighborCount,
+            };
+
+            entityManager.SetSharedComponentData(entity, sharedAgentData);
         }
 
         private void OnValidate()
